@@ -4,7 +4,11 @@ import { FormEvent, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams: { text: string; speed: string; timer: string };
+}) {
   const router = useRouter();
 
   const handleSubmit = useCallback(
@@ -12,14 +16,24 @@ export default function Home() {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
       const entries = Array.from(data.entries()) as [string, string][];
-      router.push(`/prompter?${new URLSearchParams(entries)}`);
+      const searchParams = new URLSearchParams(entries);
+      router.replace(`/?${searchParams}`);
+      setTimeout(() => {
+        router.push(`/prompter?${searchParams}`);
+      }, 100);
     },
     [router]
   );
 
   return (
     <form className={styles.main} onSubmit={handleSubmit}>
-      <textarea name="text" placeholder="הטקסט" rows={10} required />
+      <textarea
+        name="text"
+        placeholder="הטקסט"
+        rows={10}
+        required
+        defaultValue={searchParams.text || ""}
+      />
       <label>
         מהירות:{" "}
         <input
@@ -28,12 +42,18 @@ export default function Home() {
           min="0"
           max="10"
           step={1}
-          defaultValue={5}
+          defaultValue={searchParams.speed || 5}
         />
       </label>
       <label>
         טיימר:{" "}
-        <input name="timer" type="number" step={1} min="0" defaultValue={3} />{" "}
+        <input
+          name="timer"
+          type="number"
+          step={1}
+          min="0"
+          defaultValue={searchParams.timer || 3}
+        />{" "}
         שניות
       </label>
 

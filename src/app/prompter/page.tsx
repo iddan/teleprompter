@@ -4,10 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
 export default function Prompter({
-  params,
   searchParams,
 }: {
-  params: {};
   searchParams: { text: string; speed: string; timer: string };
 }) {
   const { text } = searchParams;
