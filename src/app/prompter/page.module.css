@@ -1,0 +1,39 @@
+.main {
+  padding: 16px;
+  padding-top: 3rem;
+}
+
+.main::after {
+  content: "";
+  display: block;
+  height: 100vh;
+  border-top: 2px solid currentColor;
+}
+
+.main > p {
+  font-size: 3rem;
+  line-height: 3em;
+}
+
+.main > aside {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 4px;
+}
+
+.pause,
+.countdown {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
