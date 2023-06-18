@@ -27,10 +27,11 @@ export default function Home({
 
   return (
     <form className={styles.main} onSubmit={handleSubmit}>
+      <h1>טלפרומפטר</h1>
       <textarea
         name="text"
         placeholder="הטקסט"
-        rows={10}
+        rows={9}
         required
         defaultValue={searchParams.text || ""}
       />
