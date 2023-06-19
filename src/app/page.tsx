@@ -37,10 +37,10 @@ export default function Home() {
         <input
           name="speed"
           type="range"
-          min="0"
+          min="1"
           max="10"
           step={1}
-          defaultValue={searchParams.get("speed") || 5}
+          defaultValue={searchParams.get("speed") || 1}
         />
       </label>
       <label>

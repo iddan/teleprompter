@@ -10,7 +10,7 @@
   border-top: 2px solid currentColor;
 }
 
-.main > p {
+.main > section > p {
   font-size: 3rem;
   line-height: 3em;
 }
@@ -36,4 +36,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.seen {
+  opacity: 0.5;
 }

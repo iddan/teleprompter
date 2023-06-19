@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import styles from "./page.module.css";
 import { useSearchParams } from "next/navigation";
+import useInterval from "../use-interval";
+import getFirstVisibleChildIndex from "../get-visible-first-child-index";
+import styles from "./page.module.css";
 
 export default function Prompter() {
   const searchParams = useSearchParams();
@@ -10,24 +12,73 @@ export default function Prompter() {
   const paragraphs = text.split("\n").filter(Boolean);
   const speed = parseInt(searchParams.get("speed")!);
   const timer = parseInt(searchParams.get("timer")!);
-  const intervalRef = useRef<NodeJS.Timer>();
   const [playing, setPlaying] = useState(false);
   const [timerActive, setTimerActive] = useState(Boolean(timer));
+  const interval = useInterval();
+  const contentSectionRef = useRef<HTMLElement>(null);
+  const [highlightedWordsByParagraph, setHighlightedWordsByParagraph] =
+    useState<number[]>([]);
 
   const pause = useCallback(() => {
-    clearInterval(intervalRef.current);
-    intervalRef.current = undefined;
+    interval.clear();
     setPlaying(false);
-  }, []);
+  }, [interval]);
 
   const play = useCallback(() => {
-    clearInterval(intervalRef.current);
+    const delay = 300 * speed;
 
-    intervalRef.current = setInterval(() => {
-      window.scrollBy(0, 144);
-    }, 1000 * speed);
+    const contentSection = contentSectionRef.current;
+
+    if (!contentSection) throw new Error("No content section");
+
+    let currentParagraphIndex = 0;
+    let seenWords = 0;
+
+    interval.set(() => {
+      const paragraphIndex = getFirstVisibleChildIndex(
+        document.documentElement.scrollTop,
+        contentSection
+      );
+
+      if (paragraphIndex === null) return;
+
+      if (currentParagraphIndex !== paragraphIndex) {
+        currentParagraphIndex = paragraphIndex;
+        seenWords = 0;
+        setHighlightedWordsByParagraph((prev) => {
+          const next = [...prev];
+          next[paragraphIndex] = 0;
+          return next;
+        });
+      }
+
+      const paragraph = contentSection.children[paragraphIndex];
+
+      if (!(paragraph instanceof HTMLParagraphElement)) return;
+
+      const words = paragraph.textContent!.split(" ");
+
+      if (seenWords !== words.length) {
+        seenWords++;
+        setHighlightedWordsByParagraph((prev) => {
+          const next = [...prev];
+          next[paragraphIndex] = seenWords;
+          return next;
+        });
+        return;
+      }
+
+      const nextParagraph = contentSection.children[paragraphIndex + 1];
+
+      if (nextParagraph) {
+        nextParagraph.scrollIntoView({ behavior: "smooth" });
+      } else {
+        pause();
+      }
+    }, delay);
+
     setPlaying(true);
-  }, [speed]);
+  }, [interval, speed, pause]);
 
   const handleClick = useCallback(() => {
     if (playing) pause();
@@ -38,8 +89,9 @@ export default function Prompter() {
     window.scrollTo(0, 0);
 
     let lastScroll = 0;
-    const handleScroll = (event: Event) => {
-      if (lastScroll - window.scrollY > 0) pause();
+    const handleScroll = () => {
+      const scrollingUp = lastScroll - window.scrollY > 0;
+      if (scrollingUp) pause();
       lastScroll = window.scrollY;
     };
 
@@ -56,20 +108,37 @@ export default function Prompter() {
     <main className={styles.main} onClick={handleClick}>
       {timerActive && <Countdown start={timer} />}
       {!timerActive && !playing && <div className={styles.pause}>⏸</div>}
-      {paragraphs.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
-      ))}
+      <section ref={contentSectionRef}>
+        {paragraphs.map((paragraph, i) => {
+          const highlightedWords = highlightedWordsByParagraph[i];
+          return (
+            <p key={i}>
+              {paragraph.split(" ").map((word, j) => (
+                <>
+                  <span
+                    key={j}
+                    className={j < highlightedWords ? styles.seen : undefined}
+                  >
+                    {word}
+                  </span>{" "}
+                </>
+              ))}
+            </p>
+          );
+        })}
+      </section>
     </main>
   );
 }
 
 const Countdown = ({ start }: { start: number }) => {
   const [value, setValue] = useState(start);
+  const interval = useInterval();
   useEffect(() => {
-    const interval = setInterval(() => {
+    interval.set(() => {
       setValue((prevValue) => prevValue - 1);
     }, 1000);
-    return () => clearInterval(interval);
+    return () => interval.clear();
   });
   return <div className={styles.countdown}>{value}</div>;
 };
