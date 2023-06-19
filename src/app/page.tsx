@@ -1,14 +1,11 @@
 "use client";
 
 import { FormEvent, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 
-export default function Home({
-  searchParams,
-}: {
-  searchParams: { text: string; speed: string; timer: string };
-}) {
+export default function Home() {
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const handleSubmit = useCallback(
@@ -33,7 +30,7 @@ export default function Home({
         placeholder="הטקסט"
         rows={9}
         required
-        defaultValue={searchParams.text || ""}
+        defaultValue={searchParams.get("text") || ""}
       />
       <label>
         מהירות:{" "}
@@ -43,7 +40,7 @@ export default function Home({
           min="0"
           max="10"
           step={1}
-          defaultValue={searchParams.speed || 5}
+          defaultValue={searchParams.get("speed") || 5}
         />
       </label>
       <label>
@@ -53,7 +50,7 @@ export default function Home({
           type="number"
           step={1}
           min="0"
-          defaultValue={searchParams.timer || 3}
+          defaultValue={searchParams.get("timer") || 3}
         />{" "}
         שניות
       </label>

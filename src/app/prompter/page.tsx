@@ -2,16 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
+import { useSearchParams } from "next/navigation";
 
-export default function Prompter({
-  searchParams,
-}: {
-  searchParams: { text: string; speed: string; timer: string };
-}) {
-  const { text } = searchParams;
+export default function Prompter() {
+  const searchParams = useSearchParams();
+  const text = searchParams.get("text")!;
   const paragraphs = text.split("\n").filter(Boolean);
-  const speed = parseInt(searchParams.speed);
-  const timer = parseInt(searchParams.timer);
+  const speed = parseInt(searchParams.get("speed")!);
+  const timer = parseInt(searchParams.get("timer")!);
   const intervalRef = useRef<NodeJS.Timer>();
   const [playing, setPlaying] = useState(false);
   const [timerActive, setTimerActive] = useState(Boolean(timer));
