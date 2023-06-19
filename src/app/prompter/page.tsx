@@ -31,7 +31,25 @@ export default function Prompter() {
 
     if (!contentSection) throw new Error("No content section");
 
-    let currentParagraphIndex = 0;
+    // cleanup
+    const paragraphIndex = getFirstVisibleChildIndex(
+      document.documentElement.scrollTop,
+      contentSection
+    );
+
+    if (paragraphIndex === null) return;
+
+    setHighlightedWordsByParagraph((prev) => {
+      const next = prev.slice(0, paragraphIndex).map((_, i) => {
+        return paragraphs[i].split(" ").length;
+      });
+      next[paragraphIndex] = 0;
+      return next;
+    });
+
+    // every tick
+
+    let currentParagraphIndex = paragraphIndex;
     let seenWords = 0;
 
     interval.set(() => {
