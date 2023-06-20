@@ -25,7 +25,7 @@ export default function Prompter() {
   }, [interval]);
 
   const play = useCallback(() => {
-    const delay = 300 * speed;
+    const delay = 1500 / speed;
 
     const contentSection = contentSectionRef.current;
 

@@ -40,7 +40,7 @@ export default function Home() {
           min="1"
           max="10"
           step={1}
-          defaultValue={searchParams.get("speed") || 1}
+          defaultValue={searchParams.get("speed") || 5}
         />
       </label>
       <label>
