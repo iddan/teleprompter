@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import useInterval from "../use-interval";
 import getFirstVisibleChildIndex from "../get-visible-first-child-index";
@@ -9,15 +9,19 @@ import styles from "./page.module.css";
 export default function Prompter() {
   const searchParams = useSearchParams();
   const text = searchParams.get("text")!;
-  const paragraphs = text.split("\n").filter(Boolean);
   const speed = parseInt(searchParams.get("speed")!);
   const timer = parseInt(searchParams.get("timer")!);
+
   const [playing, setPlaying] = useState(false);
   const [timerActive, setTimerActive] = useState(Boolean(timer));
-  const interval = useInterval();
-  const contentSectionRef = useRef<HTMLElement>(null);
   const [highlightedWordsByParagraph, setHighlightedWordsByParagraph] =
     useState<number[]>([]);
+
+  const contentSectionRef = useRef<HTMLElement>(null);
+
+  const interval = useInterval();
+
+  const paragraphs = useMemo(() => text.split("\n").filter(Boolean), [text]);
 
   const pause = useCallback(() => {
     interval.clear();
@@ -96,7 +100,7 @@ export default function Prompter() {
     }, delay);
 
     setPlaying(true);
-  }, [interval, speed, pause]);
+  }, [interval, paragraphs, speed, pause]);
 
   const handleClick = useCallback(() => {
     if (playing) pause();
