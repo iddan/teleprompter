@@ -140,9 +140,10 @@ export default function Prompter() {
       <section ref={contentSectionRef}>
         {paragraphs.map((paragraph, i) => {
           const highlightedWords = highlightedWordsByParagraph[i];
+          const words = paragraph.split(" ");
           return (
             <p key={i}>
-              {paragraph.split(" ").map((word, j) => (
+              {words.map((word, j) => (
                 <>
                   <span
                     key={j}
