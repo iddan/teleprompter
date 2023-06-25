@@ -56,6 +56,7 @@ export default function Prompter() {
 
     let currentParagraphIndex = paragraphIndex;
     let seenWords = 0;
+    let paragraphScrolledToIndex: number | null = null;
 
     interval.set(() => {
       const paragraphIndex = getFirstVisibleChildIndex(
@@ -63,7 +64,16 @@ export default function Prompter() {
         contentSection
       );
 
-      if (paragraphIndex === null) return;
+      if (
+        paragraphIndex === null ||
+        (paragraphScrolledToIndex !== null &&
+          paragraphScrolledToIndex !== paragraphIndex)
+      )
+        return;
+
+      if (paragraphScrolledToIndex === paragraphIndex) {
+        paragraphScrolledToIndex = null;
+      }
 
       if (currentParagraphIndex !== paragraphIndex) {
         currentParagraphIndex = paragraphIndex;
@@ -94,6 +104,7 @@ export default function Prompter() {
       const nextParagraph = contentSection.children[paragraphIndex + 1];
 
       if (nextParagraph) {
+        paragraphScrolledToIndex = paragraphIndex + 1;
         nextParagraph.scrollIntoView({ behavior: "smooth" });
       } else {
         pause();
