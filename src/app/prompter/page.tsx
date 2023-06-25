@@ -17,6 +17,7 @@ export default function Prompter() {
   const [highlightedWordsByParagraph, setHighlightedWordsByParagraph] =
     useState<number[]>([]);
 
+  const mainRef = useRef<HTMLElement>(null);
   const contentSectionRef = useRef<HTMLElement>(null);
 
   const interval = useInterval();
@@ -108,6 +109,12 @@ export default function Prompter() {
   }, [playing, play, pause]);
 
   useEffect(() => {
+    mainRef.current?.requestFullscreen({
+      navigationUI: "hide",
+    });
+  }, [mainRef]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
 
     let lastScroll = 0;
@@ -127,7 +134,7 @@ export default function Prompter() {
   }, [play, pause, timer]);
 
   return (
-    <main className={styles.main} onClick={handleClick}>
+    <main className={styles.main} onClick={handleClick} ref={mainRef}>
       {timerActive && <Countdown start={timer} />}
       {!timerActive && !playing && <div className={styles.pause}>⏸</div>}
       <section ref={contentSectionRef}>
