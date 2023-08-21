@@ -120,9 +120,10 @@ export default function Prompter() {
   }, [playing, play, pause]);
 
   useEffect(() => {
-    mainRef.current?.requestFullscreen({
-      navigationUI: "hide",
-    });
+    if (mainRef.current?.requestFullscreen)
+      mainRef.current?.requestFullscreen({
+        navigationUI: "hide",
+      });
   }, [mainRef]);
 
   useEffect(() => {
